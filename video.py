@@ -3,6 +3,8 @@ from tkinter import filedialog, messagebox, ttk
 
 from pytube import YouTube
 
+from pytube.exceptions import RegexMatchError
+
 
 class Video:
     def __init__(self):
@@ -18,31 +20,36 @@ class Video:
         location_entry.config(text=self.download_location)
 
     def convert(self, window, link_entry):
-        self.video = YouTube(url=link_entry.get())
+        try:
+            self.video = YouTube(url=link_entry.get())
 
-        self.resolutions = []
+        except RegexMatchError:
+            messagebox.showerror(title="Invalid Link", message="The video link is invalid.")
 
-        for stream in self.video.streams:
-            resolution = stream.resolution
-            if resolution and resolution not in self.resolutions:
-                self.resolutions.append(resolution)
+        else:
+            self.resolutions = []
 
-        self.resolutions.sort()
+            for stream in self.video.streams:
+                resolution = stream.resolution
+                if resolution and resolution not in self.resolutions:
+                    self.resolutions.append(resolution)
 
-        self.resolution_label = Label(text="Resolution:")
-        self.resolution_label.grid(row=3, column=0)
+            self.resolutions.sort()
 
-        self.resolution_chose = StringVar()
-        self.resolution_box = ttk.Combobox(window, width=27, textvariable=self.resolution_chose)
+            self.resolution_label = Label(text="Resolution:")
+            self.resolution_label.grid(row=3, column=0)
 
-        self.resolution_box['values'] = self.resolutions
+            self.resolution_chose = StringVar()
+            self.resolution_box = ttk.Combobox(window, width=27, textvariable=self.resolution_chose)
 
-        self.resolution_box.grid(column=1, row=3)
-        self.resolution_box.current()
+            self.resolution_box['values'] = self.resolutions
+
+            self.resolution_box.grid(column=1, row=3)
+            self.resolution_box.current()
 
     def download(self):
         if self.video.age_restricted:
-            messagebox.showerror(title="Age restricted",
+            messagebox.showerror(title="Age Restricted",
                                  message="This video is age restricted so you can't download it.")
 
         else:
@@ -60,3 +67,8 @@ class Video:
                 )
 
             video_filtered.first().download(output_path=self.download_location)
+
+            messagebox.showinfo(
+                title="Successful Download",
+                message="The video has been downloaded successfully."
+            )
