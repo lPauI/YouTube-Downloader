@@ -16,8 +16,11 @@ class Video:
         self.resolutions = None
 
     def set_location(self, location_entry):
-        self.download_location = filedialog.askdirectory()
-        location_entry.config(text=self.download_location)
+        temp_location = filedialog.askdirectory()
+        
+        if temp_location:
+            self.download_location = temp_location
+            location_entry.config(text=self.download_location)
 
     def convert(self, window, link_entry):
         try:
@@ -48,6 +51,11 @@ class Video:
             self.resolution_box.current()
 
     def download(self):
+        if self.video == None:
+            messagebox.showerror(title="Video not converted",
+                                 message="The video was not converted so you can't download it.")
+            return
+        
         if self.video.age_restricted:
             messagebox.showerror(title="Age Restricted",
                                  message="This video is age restricted so you can't download it.")
