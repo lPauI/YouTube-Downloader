@@ -51,7 +51,7 @@ class Video:
             self.resolution_box.current()
 
     def download(self):
-        if self.video == None:
+        if not self.video:
             messagebox.showerror(title="Video not converted",
                                  message="The video was not converted so you can't download it.")
             return
